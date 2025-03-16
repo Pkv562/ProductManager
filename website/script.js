@@ -1,20 +1,20 @@
-document.addEventListener("DOMContentLoaded", () => {
-    const addProductBtn = document.getElementById("add-product");
-    const modal = document.getElementById("product-modal");
-    const closeBtn = document.querySelector(".close");
-    const submitBtn = document.getElementById("submitProduct");
-    const showAllBtn = document.getElementById("show-all");
-    const searchInput = document.getElementById("search");
-    const productList = document.getElementById("product-list");
+document.addEventListener("DOMContentLoaded", () => { // Wait for the page to load
+    const addProductBtn = document.getElementById("add-product"); // Get the "Add Product" button
+    const modal = document.getElementById("product-modal"); // Get the modal
+    const closeBtn = document.querySelector(".close"); // Get the close button
+    const submitBtn = document.getElementById("submitProduct"); // Get the submit button
+    const showAllBtn = document.getElementById("show-all"); // Get the "Show All" button
+    const searchInput = document.getElementById("search"); // Get the search input
+    const productList = document.getElementById("product-list"); // Get the product list
 
-    const nameInput = document.getElementById("productName");
-    const descriptionInput = document.getElementById("productDescription");
-    const priceInput = document.getElementById("productPrice");
+    const nameInput = document.getElementById("productName"); // Get the name input
+    const descriptionInput = document.getElementById("productDescription"); // Get the description input
+    const priceInput = document.getElementById("productPrice"); // Get the price input
 
-    let editingProductId = null; 
-    let allUsers = []; 
+    let editingProductId = null; // Variable to store the ID of the product being edited
+    let allUsers = [];  // Array to store all users
 
-    async function fetchUsers() {
+    async function fetchUsers() { // Function to fetch all users from the server
         try {
             const response = await fetch("http://localhost:5000/users");
             allUsers = await response.json(); 
@@ -24,54 +24,54 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    document.getElementById("search").addEventListener("input", (event) => {
-        const searchQuery = event.target.value.trim().toLowerCase();
+    document.getElementById("search").addEventListener("input", (event) => { // Listen for input events on the search input
+        const searchQuery = event.target.value.trim().toLowerCase(); // Get the search query and convert it to lowercase
     
-        fetch("http://localhost:5000/users")
-            .then(response => response.json())
+        fetch("http://localhost:5000/users") // Fetch all users from the server
+            .then(response => response.json()) // Parse the JSON response
             .then(users => {
                 const filteredUsers = users.filter(user =>
-                    user.id.toString().toLowerCase().includes(searchQuery) || 
-                    user.firstName.toLowerCase().includes(searchQuery) 
+                    user.id.toString().toLowerCase().includes(searchQuery) || // Check if the ID includes the search query 
+                    user.firstName.toLowerCase().includes(searchQuery)  // Check if the name includes the search query
                 );
     
-                updateProductList(filteredUsers);
+                updateProductList(filteredUsers); // Update the product list with the filtered users
             })
             .catch(error => console.error("Error fetching users:", error));
 });
 
-    addProductBtn.addEventListener("click", () => {
+    addProductBtn.addEventListener("click", () => { // Listen for click events on the "Add Product" button
         editingProductId = null;
         clearForm();
-        modal.style.display = "flex";
+        modal.style.display = "flex"; // Display the modal
     });
 
-    closeBtn.addEventListener("click", () => {
-        modal.style.display = "none";
+    closeBtn.addEventListener("click", () => { // Listen for click events on the close button
+        modal.style.display = "none"; // Hide the modal
     });
 
-    window.addEventListener("click", (event) => {
-        if (event.target === modal) {
-            modal.style.display = "none";
+    window.addEventListener("click", (event) => { // Listen for click events on the window
+        if (event.target === modal) { // If the click event is on the modal
+            modal.style.display = "none"; // Hide the modal
         }
     });
 
-    submitBtn.addEventListener("click", async () => {
-        const name = nameInput.value.trim();
-        const description = descriptionInput.value.trim();
-        const price = priceInput.value.trim();
+    submitBtn.addEventListener("click", async () => { // Listen for click events on the submit button
+        const name = nameInput.value.trim(); // Get the value of the name input and remove whitespace
+        const description = descriptionInput.value.trim(); // Get the value of the description input and remove whitespace
+        const price = priceInput.value.trim(); // Get the value of the price input and remove whitespace
 
-        if (!name && !description && !price) {
+        if (!name && !description && !price) { // If all fields are empty
             alert("Please fill in at least one field.");
             return;
         }
 
-        const userData = {};
+        const userData = {}; // Create an empty object to store user data
         if (name) userData.firstName = name;
         if (description) userData.lastName = description;
         if (price) userData.Age = price;
 
-        try {
+        try { // Try to add/update the user
             if (editingProductId) {
                 await fetch(`http://localhost:5000/users/${editingProductId}`, {
                     method: "PATCH",
@@ -79,7 +79,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     body: JSON.stringify(userData),
                 });
                 showSuccessMessage(`User with ID ${editingProductId} updated!`);
-            } else {
+            } else { // If no product ID is set, add a new user
                 const response = await fetch("http://localhost:5000/users", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -93,19 +93,19 @@ document.addEventListener("DOMContentLoaded", () => {
             console.error("Error adding/updating user:", error);
         }
 
-        modal.style.display = "none";
-        clearForm();
+        modal.style.display = "none"; // Hide the modal
+        clearForm(); // Clear the form fields
     });
+ 
+    showAllBtn.addEventListener("click", fetchUsers); // Listen for click events on the "Show All" button
 
-    showAllBtn.addEventListener("click", fetchUsers);
-
-    function updateProductList(users) {
+    function updateProductList(users) { // Function to update the product list with the given users
         productList.innerHTML = ""; 
 
-        users.forEach(user => {
+        users.forEach(user => { // Loop through each user
             const productItem = document.createElement("div");
             productItem.classList.add("product-item");
-            productItem.innerHTML = `
+            productItem.innerHTML = ` 
                 <div style="margin-top: 18px;">
                     <strong>ID:</strong> ${user.id} <br>
                     <strong>Name:</strong> ${user.firstName} <br>
@@ -117,14 +117,14 @@ document.addEventListener("DOMContentLoaded", () => {
                     <button class="delete-btn" data-id="${user.id}">Delete</button>
                 </div>
             `;
-            productList.appendChild(productItem);
+            productList.appendChild(productItem); // Append the product item to the product list
         });
 
-        document.querySelectorAll(".delete-btn").forEach(button => {
-            button.addEventListener("click", async (event) => {
-                const userId = event.target.getAttribute("data-id");
+        document.querySelectorAll(".delete-btn").forEach(button => { // Listen for click events on the delete buttons
+            button.addEventListener("click", async (event) => { // Listen for click events on the delete buttons
+                const userId = event.target.getAttribute("data-id"); // Get the ID of the user to delete
                 try {
-                    await fetch(`http://localhost:5000/users/${userId}`, { method: "DELETE" });
+                    await fetch(`http://localhost:5000/users/${userId}`, { method: "DELETE" }); // Delete the user
                     showSuccessMessage(`User with ID ${userId} deleted!`);
                     fetchUsers();
                 } catch (error) {
@@ -133,20 +133,20 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         });
 
-        document.querySelectorAll(".edit-btn").forEach(button => {
-            button.addEventListener("click", async (event) => {
+        document.querySelectorAll(".edit-btn").forEach(button => { // Listen for click events on the edit buttons
+            button.addEventListener("click", async (event) => { // Listen for click events on the edit buttons
                 const userId = event.target.getAttribute("data-id");
                 editingProductId = userId;
 
                 try {
-                    const response = await fetch(`http://localhost:5000/users/${userId}`);
-                    const user = await response.json();
+                    const response = await fetch(`http://localhost:5000/users/${userId}`); // Fetch the user details
+                    const user = await response.json(); // Parse the JSON response
 
                     nameInput.value = user.firstName || "";
                     descriptionInput.value = user.lastName || "";
                     priceInput.value = user.Age || "";
 
-                    modal.style.display = "flex";
+                    modal.style.display = "flex"; // Display the modal
                 } catch (error) {
                     console.error("Error fetching user details:", error);
                 }
@@ -154,7 +154,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    function showSuccessMessage(message) {
+    function showSuccessMessage(message) { // Function to show a success message
         const successMessage = document.createElement("div");
         successMessage.textContent = message;
         successMessage.style.position = "fixed";
@@ -167,16 +167,16 @@ document.addEventListener("DOMContentLoaded", () => {
         successMessage.style.boxShadow = "0 2px 5px rgba(0,0,0,0.2)";
         document.body.appendChild(successMessage);
 
-        setTimeout(() => {
+        setTimeout(() => { // Hide the success message after 2 seconds
             successMessage.remove();
         }, 2000);
     }
 
-    function clearForm() {
+    function clearForm() { // Function to clear the form fields
         nameInput.value = "";
         descriptionInput.value = "";
         priceInput.value = "";
     }
 
-    fetchUsers(); 
+    fetchUsers(); // Fetch all users when the page loads
 });
