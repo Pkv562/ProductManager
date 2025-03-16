@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Management</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Product Management</h2>
+        <button id="add-product">Add Product</button>
+
+        <div class="search-container">
+            <input type="text" id="search" placeholder="Search Product">
+            <button id="show-all">Show All</button>
+        </div>
+
+        <div id="product-list">
+
+        </div>
+    </div>
+
+    <div id="product-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Add Product</h3>
+            <label for="productName">Name:</label>
+            <input type="text" id="productName" placeholder="Enter product name">
+            
+            <label for="productDescription">Description:</label>
+            <textarea id="productDescription" placeholder="Enter description"></textarea>
+
+            <label for="productPrice">Price:</label>
+            <input type="number" id="productPrice" placeholder="Enter price">
+
+            <button id="submitProduct">Submit</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
